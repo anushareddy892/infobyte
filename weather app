@@ -1,0 +1,59 @@
+import requests
+
+# Function to fetch weather data
+def get_weather(api_key, location):
+    base_url = "http://api.openweathermap.org/data/2.5/weather?"
+
+    # Define the full API URL
+    complete_url = f"{base_url}q={location}&appid={api_key}&units=metric"  # Celsius temperature
+    try:
+        response = requests.get(complete_url)
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            data = response.json()
+
+            # Check if the city is found
+            if data.get('cod') != 200:
+                print(f"Error: {data.get('message')}")
+                return
+
+            # Extract relevant data
+            main = data['main']
+            weather = data['weather'][0]
+            wind = data['wind']
+
+            temperature = main['temp']
+            humidity = main['humidity']
+            description = weather['description']
+            wind_speed = wind['speed']
+
+            # Print the weather information
+            print(f"Weather in {location.capitalize()}:")
+            print(f"Temperature: {temperature}°C")
+            print(f"Humidity: {humidity}%")
+            print(f"Condition: {description.capitalize()}")
+            print(f"Wind Speed: {wind_speed} m/s")
+        else:
+            print(f"Failed to retrieve data. HTTP status code: {response.status_code}")
+            # Print the response text to get more information about the error
+            print("Error details:", response.text)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+# Main function to take user input
+def main():
+    # Replace with your OpenWeatherMap API key
+    api_key = "44d267fdf5943d36aa62c0a5d7d22177"  # Replace with your real API key
+
+    # Take user input for location (city name or ZIP code)
+    location = input("Enter city name or ZIP code: ").strip()
+
+    if not location:
+        print("You must enter a location.")
+        return
+
+    # Call the function to get weather data
+    get_weather(api_key, location)
+if __name__ == "__main__":
+    main()
